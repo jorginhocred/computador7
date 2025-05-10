@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Empréstimo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Exo+2:wght@400;600&display=swap');
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: 'Exo 2', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: auto;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px #FFD700, 0 0 30px #ffffff;
+            backdrop-filter: blur(8px);
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px;
+        }
+
+        .header-image {
+            width: 70%; /* Reduzido em 30% */
+            height: auto;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: contain; /* Garante que a imagem não seja cortada */
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #FFD700;
+            text-shadow: 0 0 8px #FFD700;
+            margin-bottom: 20px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #FFD700;
+            text-shadow: 0 0 4px #FFD700;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            color: #ffffff;
+            font-family: 'Exo 2', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 8px #ffffff;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(45deg, #FFD700, #ffffff);
+            border: none;
+            border-radius: 5px;
+            color: #000000;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px #FFD700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #FFD700;
+        }
+
+        th {
+            background: linear-gradient(45deg, #FFD700, #ffffff);
+            color: #000000;
+            text-transform: uppercase;
+            text-shadow: 0 0 4px #000000;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        td {
+            color: #ffffff;
+            text-shadow: 0 0 4px #FFD700;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 8px #FFD700 inset;
+        }
+
+        /* Estilo para destacar a linha do 7,8% */
+        tr.row-78 {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        /* Estilo para destacar as linhas 8,8% a 10,3% */
+        tr.row-88-to-103 {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Estilo para categorias de linhas */
+        tr.category-1 {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        tr.category-2 {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tr.category-3 {
+            background: rgba(255, 215, 0, 0.07);
+        }
+
+        tr.category-4 {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        tr.category-5 {
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        /* Estilo para linhas selecionadas */
+        tr.selected-row {
+            background: linear-gradient(45deg, #000080, #4682B4);
+            color: #ffffff;
+            text-shadow: 0 0 4px #000000;
+        }
+
+        /* Estilo para o canvas do screenshot */
+        #screenshotCanvas {
+            display: none;
+            margin: 20px auto;
+        }
+
+        /* Estilo para a tabela do screenshot */
+        .screenshot-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-family: 'Exo 2', sans-serif;
+            color: #000000;
+            width: 500px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .screenshot-container img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .screenshot-container h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: #FFD700;
+            text-shadow: 0 0 4px #000000;
+        }
+
+        .screenshot-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .screenshot-table th, .screenshot-table td {
+            padding: 10px;
+            border: 1px solid #FFD700;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .screenshot-table th {
+            background: linear-gradient(45deg, #FFD700, #ffffff);
+            color: #000000;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        .screenshot-table td {
+            background: #f9f9f9;
+            color: #000000;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .screenshot-container {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .screenshot-container img {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho com a imagem -->
+        <img src="https://uploaddeimagens.com.br/images/004/897/265/original/JORGINHOCRED.jpg?1746792605" alt="Banner Jorginho Cred" class="header-image">
+
+        <!-- Título da tabela -->
+        <h2>Tabela de Taxas</h2>
+
+        <label for="valorInicial">Valor Inicial:</label>
+        <input type="number" id="valorInicial" min="0" step="0.01" aria-label="Valor inicial do empréstimo" oninput="calcularValores()">
+
+        <label for="parcelas">Parcelas:</label>
+        <input type="number" id="parcelas" min="1" max="21" aria-label="Número de parcelas" oninput="calcularValores()">
+
+        <label for="bandeira">Bandeira:</label>
+        <select id="bandeira" aria-label="Bandeira do cartão" onchange="calcularValores()">
+            <option value="banese">Banese</option>
+            <option value="visa-master">Visa/Master</option>
+        </select>
+
+        <button onclick="tirarScreenshot()">Gerar Print</button>
+
+        <table id="tabelaSimulacao">
+            <thead>
+                <tr>
+                    <th>Parcelas</th>
+                    <th>Juros</th>
+                    <th>Valor a Receber</th>
+                    <th>Valor a Cobrar</th>
+                    <th>Parcela Recebida</th>
+                    <th>Parcela a Pagar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="row-78 category-1">
+                    <td>1x</td>
+                    <td id="juros1">-</td>
+                    <td id="valorDesc1">-</td>
+                    <td id="valorFechado1">-</td>
+                    <td id="valorParcelaReceber1">-</td>
+                    <td id="valorParcelaCobrar1">-</td>
+                </tr>
+                <tr class="row-88-to-103 category-2">
+                    <td>2x</td>
+                    <td id="juros2">-</td>
+                    <td id="valorDesc2">-</td>
+                    <td id="valorFechado2">-</td>
+                    <td id="valorParcelaReceber2">-</td>
+                    <td id="valorParcelaCobrar2">-</td>
+                </tr>
+                <tr class="row-88-to-103 category-2">
+                    <td>3x</td>
+                    <td id="juros3">-</td>
+                    <td id="valorDesc3">-</td>
+                    <td id="valorFechado3">-</td>
+                    <td id="valorParcelaReceber3">-</td>
+                    <td id="valorParcelaCobrar3">-</td>
+                </tr>
+                <tr class="row-88-to-103 category-2">
+                    <td>4x</td>
+                    <td id="juros4">-</td>
+                    <td id="valorDesc4">-</td>
+                    <td id="valorFechado4">-</td>
+                    <td id="valorParcelaReceber4">-</td>
+                    <td id="valorParcelaCobrar4">-</td>
+                </tr>
+                <tr class="category-3">
+                    <td>5x</td>
+                    <td id="juros5">-</td>
+                    <td id="valorDesc5">-</td>
+                    <td id="valorFechado5">-</td>
+                    <td id="valorParcelaReceber5">-</td>
+                    <td id="valorParcelaCobrar5">-</td>
+                </tr>
+                <tr class="category-3">
+                    <td>6x</td>
+                    <td id="juros6">-</td>
+                    <td id="valorDesc6">-</td>
+                    <td id="valorFechado6">-</td>
+                    <td id="valorParcelaReceber6">-</td>
+                    <td id="valorParcelaCobrar6">-</td>
+                </tr>
+                <tr class="category-3">
+                    <td>7x</td>
+                    <td id="juros7">-</td>
+                    <td id="valorDesc7">-</td>
+                    <td id="valorFechado7">-</td>
+                    <td id="valorParcelaReceber7">-</td>
+                    <td id="valorParcelaCobrar7">-</td>
+                </tr>
+                <tr class="category-3">
+                    <td>8x</td>
+                    <td id="juros8">-</td>
+                    <td id="valorDesc8">-</td>
+                    <td id="valorFechado8">-</td>
+                    <td id="valorParcelaReceber8">-</td>
+                    <td id="valorParcelaCobrar8">-</td>
+                </tr>
+                <tr class="category-4">
+                    <td>9x</td>
+                    <td id="juros9">-</td>
+                    <td id="valorDesc9">-</td>
+                    <td id="valorFechado9">-</td>
+                    <td id="valorParcelaReceber9">-</td>
+                    <td id="valorParcelaCobrar9">-</td>
+                </tr>
+                <tr class="category-4">
+                    <td>10x</td>
+                    <td id="juros10">-</td>
+                    <td id="valorDesc10">-</td>
+                    <td id="valorFechado10">-</td>
+                    <td id="valorParcelaReceber10">-</td>
+                    <td id="valorParcelaCobrar10">-</td>
+                </tr>
+                <tr class="category-4">
+                    <td>11x</td>
+                    <td id="juros11">-</td>
+                    <td id="valorDesc11">-</td>
+                    <td id="valorFechado11">-</td>
+                    <td id="valorParcelaReceber11">-</td>
+                    <td id="valorParcelaCobrar11">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>12x</td>
+                    <td id="juros12">-</td>
+                    <td id="valorDesc12">-</td>
+                    <td id="valorFechado12">-</td>
+                    <td id="valorParcelaReceber12">-</td>
+                    <td id="valorParcelaCobrar12">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>13x</td>
+                    <td id="juros13">-</td>
+                    <td id="valorDesc13">-</td>
+                    <td id="valorFechado13">-</td>
+                    <td id="valorParcelaReceber13">-</td>
+                    <td id="valorParcelaCobrar13">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>14x</td>
+                    <td id="juros14">-</td>
+                    <td id="valorDesc14">-</td>
+                    <td id="valorFechado14">-</td>
+                    <td id="valorParcelaReceber14">-</td>
+                    <td id="valorParcelaCobrar14">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>15x</td>
+                    <td id="juros15">-</td>
+                    <td id="valorDesc15">-</td>
+                    <td id="valorFechado15">-</td>
+                    <td id="valorParcelaReceber15">-</td>
+                    <td id="valorParcelaCobrar15">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>16x</td>
+                    <td id="juros16">-</td>
+                    <td id="valorDesc16">-</td>
+                    <td id="valorFechado16">-</td>
+                    <td id="valorParcelaReceber16">-</td>
+                    <td id="valorParcelaCobrar16">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>17x</td>
+                    <td id="juros17">-</td>
+                    <td id="valorDesc17">-</td>
+                    <td id="valorFechado17">-</td>
+                    <td id="valorParcelaReceber17">-</td>
+                    <td id="valorParcelaCobrar17">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>18x</td>
+                    <td id="juros18">-</td>
+                    <td id="valorDesc18">-</td>
+                    <td id="valorFechado18">-</td>
+                    <td id="valorParcelaReceber18">-</td>
+                    <td id="valorParcelaCobrar18">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>19x</td>
+                    <td id="juros19">-</td>
+                    <td id="valorDesc19">-</td>
+                    <td id="valorFechado19">-</td>
+                    <td id="valorParcelaReceber19">-</td>
+                    <td id="valorParcelaCobrar19">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>20x</td>
+                    <td id="juros20">-</td>
+                    <td id="valorDesc20">-</td>
+                    <td id="valorFechado20">-</td>
+                    <td id="valorParcelaReceber20">-</td>
+                    <td id="valorParcelaCobrar20">-</td>
+                </tr>
+                <tr class="category-5">
+                    <td>21x</td>
+                    <td id="juros21">-</td>
+                    <td id="valorDesc21">-</td>
+                    <td id="valorFechado21">-</td>
+                    <td id="valorParcelaReceber21">-</td>
+                    <td id="valorParcelaCobrar21">-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Canvas para o screenshot -->
+    <canvas id="screenshotCanvas" width="500" height="400"></canvas>
+
+    <script>
+        function calcularValores() {
+            // Obtém valores dos inputs
+            const valorInicial = parseFloat(document.getElementById("valorInicial").value) || 0;
+            const parcelas = parseInt(document.getElementById("parcelas").value) || 0;
+            const bandeira = document.getElementById("bandeira").value;
+
+            // Validação
+            if (valorInicial <= 0 || parcelas < 1 || parcelas > 21) {
+                for (let i = 1; i <= 21; i++) {
+                    document.getElementById("juros" + i).textContent = "-";
+                    document.getElementById("valorDesc" + i).textContent = "-";
+                    document.getElementById("valorFechado" + i).textContent = "-";
+                    document.getElementById("valorParcelaReceber" + i).textContent = "-";
+                    document.getElementById("valorParcelaCobrar" + i).textContent = "-";
+                    document.querySelectorAll("tbody tr")[i - 1].classList.remove("selected-row");
+                }
+                return;
+            }
+
+            // Calcula valores para cada linha
+            for (let i = 1; i <= 21; i++) {
+                const juros = obterTaxaJuros(i, bandeira);
+                // Valor a receber se passar o valorInicial
+                const valorReceber = calcularValorDesc(valorInicial, juros);
+                // Valor a cobrar para receber o valorInicial líquido
+                const valorCobrar = calcularValorFechado(valorInicial, juros);
+                const valorParcelaReceber = valorInicial / i; // Parcela a receber = Valor Inicial / Número de Parcelas
+                const valorParcelaCobrar = valorCobrar / i; // Parcela a pagar
+
+                // Atualiza tabela
+                document.getElementById("juros" + i).textContent = (juros * 100).toFixed(2) + "%";
+                document.getElementById("valorDesc" + i).textContent = valorReceber.toFixed(2);
+                document.getElementById("valorFechado" + i).textContent = valorCobrar.toFixed(2);
+                document.getElementById("valorParcelaReceber" + i).textContent = valorParcelaReceber.toFixed(2);
+                document.getElementById("valorParcelaCobrar" + i).textContent = valorParcelaCobrar.toFixed(2);
+
+                // Destaca linha selecionada
+                const row = document.querySelectorAll("tbody tr")[i - 1];
+                if (i === parcelas) {
+                    row.classList.add("selected-row");
+                } else {
+                    row.classList.remove("selected-row");
+                }
+            }
+        }
+
+        function obterTaxaJuros(parcela, bandeira) {
+            const taxasBanese = {
+                1: 0.078,
+                2: 0.088,
+                3: 0.098,
+                4: 0.103,
+                5: 0.108,
+                6: 0.111,
+                7: 0.122,
+                8: 0.125,
+                9: 0.135,
+                10: 0.1245,
+                11: 0.135,
+                12: 0.142,
+                13: 0.168,
+                14: 0.178,
+                15: 0.182,
+                16: 0.188,
+                17: 0.198,
+                18: 0.202,
+                19: 0.218,
+                20: 0.223,
+                21: 0.2345
+            };
+
+            const taxasVisaMaster = {
+                1: 0.063,
+                2: 0.073,
+                3: 0.083,
+                4: 0.088,
+                5: 0.093,
+                6: 0.096,
+                7: 0.107,
+                8: 0.11,
+                9: 0.12,
+                10: 0.1095,
+                11: 0.12,
+                12: 0.127,
+                13: 0.153,
+                14: 0.163,
+                15: 0.167,
+                16: 0.173,
+                17: 0.183,
+                18: 0.187,
+                19: 0.203,
+                20: 0.208,
+                21: 0.2195
+            };
+
+            if (bandeira === "visa-master") {
+                return taxasVisaMaster[parcela] || 0.2195; // Usa a taxa de 21x como padrão se ultrapassar
+            } else {
+                return taxasBanese[parcela] || 0.2345; // Usa a taxa de 21x como padrão se ultrapassar
+            }
+        }
+
+        function calcularValorFechado(valor, juros) {
+            // Calcula o valor a cobrar para receber 'valor' líquido
+            return valor * (1 + juros);
+        }
+
+        function calcularValorDesc(valor, juros) {
+            // Calcula o valor a receber se passar 'valor'
+            return valor / (1 + juros);
+        }
+
+        function tirarScreenshot() {
+            const valorInicial = parseFloat(document.getElementById("valorInicial").value) || 0;
+            const parcelas = parseInt(document.getElementById("parcelas").value) || 0;
+            const bandeira = document.getElementById("bandeira").value;
+
+            // Validação
+            if (valorInicial <= 0 || parcelas < 1 || parcelas > 21) {
+                alert("Por favor, insira um valor inicial válido e número de parcelas entre 1 e 21.");
+                return;
+            }
+
+            // Obtém a taxa de juros para o número de parcelas
+            const juros = obterTaxaJuros(parcelas, bandeira);
+
+            // Cenário 1: Cliente passa o valorInicial
+            const valorRecebido = calcularValorDesc(valorInicial, juros);
+            const parcelaRecebida = valorRecebido / parcelas;
+
+            // Cenário 2: Cliente quer receber o valorInicial
+            const valorPassado = calcularValorFechado(valorInicial, juros);
+            const parcelaPassada = valorPassado / parcelas;
+
+            // Cria um container temporário para o screenshot
+            const screenshotContainer = document.createElement("div");
+            screenshotContainer.className = "screenshot-container";
+            screenshotContainer.innerHTML = `
+                <h3>Simulação de Empréstimo</h3>
+                <table class="screenshot-table">
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2" style="background: #FFD700; color: #000000; font-weight: bold;">Se você passa R$${valorInicial.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Você recebe</td>
+                            <td>R$${valorRecebido.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Parcela a Pagar</td>
+                            <td>${parcelas}x R$${parcelaRecebida.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="background: #FFD700; color: #000000; font-weight: bold;">Se você quer receber R$${valorInicial.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Você passa</td>
+                            <td>R$${valorPassado.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Parcela a Pagar</td>
+                            <td>${parcelas}x R$${parcelaPassada.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            // Adiciona o container temporário ao corpo
+            document.body.appendChild(screenshotContainer);
+
+            // Configura o canvas
+            const canvas = document.getElementById("screenshotCanvas");
+            canvas.width = 500;
+            canvas.height = 400; // Reduzido, pois não há logo
+            const ctx = canvas.getContext("2d");
+
+            // Limpa o canvas antes de desenhar
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Usa html2canvas para capturar o container
+            html2canvas(screenshotContainer, {
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                scale: 2 // Aumenta a resolução para melhor qualidade
+            }).then(canvasImg => {
+                ctx.drawImage(canvasImg, 0, 0, canvas.width, canvas.height);
+
+                // Cria o link para download
+                const link = document.createElement("a");
+                link.download = `simulacao_${new Date().toISOString().slice(0, 10)}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+
+                // Remove o container temporário
+                document.body.removeChild(screenshotContainer);
+
+                // Exibe o canvas temporariamente para visualização
+                canvas.style.display = "block";
+                setTimeout(() => {
+                    canvas.style.display = "none";
+                }, 2000);
+            }).catch(err => {
+                console.error("Erro ao gerar screenshot:", err);
+                alert("Ocorreu um erro ao gerar o print. Tente novamente.");
+                document.body.removeChild(screenshotContainer);
+            });
+        }
+
+        // Inicializa tabela com valores padrão
+        calcularValores();
+    </script>
+    <!-- Inclui a biblioteca html2canvas para capturar a tabela -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>
